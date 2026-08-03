@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --ink: #10151F;
+  --ink-soft: #1A2130;
+  --parchment: #F6F2E9;
+  --brass: #C89B3C;
+  --verdigris: #4F8577;
+  --rust: #B4533C;
+  --slate: #8A93A6;
+}
+
+body {
+  background-color: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--parchment);
+  color: var(--ink);
+  color-scheme: light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2310151F'><path d='M5.25 7.5L10 12.25L14.75 7.5H5.25Z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px;
+  padding-right: 2.25rem !important;
+}
+
+option {
+  background-color: var(--parchment);
+  color: var(--ink);
+}
