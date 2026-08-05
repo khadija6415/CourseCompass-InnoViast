@@ -133,6 +133,7 @@ function ResourcesContent() {
           <div className="space-y-3">
             {displayResources.map((resource) => {
               const p = personalized?.[resource._id];
+              const matchedSet = new Set(p?.matchedCovers || []);
               return (
                 <button
                   key={resource._id}
@@ -152,13 +153,32 @@ function ResourcesContent() {
                     </span>
                     <span className="text-xs text-[var(--slate)]">{resource.durationMinutes} min</span>
                   </div>
+
                   {p && p.personalizedMatchPercent !== null && (
-                    <p
-                      style={{ fontFamily: 'var(--font-mono)', color: personalizedColor(p.personalizedMatchPercent) }}
-                      className="text-[10px] uppercase tracking-[0.1em] mt-1"
-                    >
-                      {p.personalizedMatchPercent}% matches your syllabus
-                    </p>
+                    <>
+                      <p
+                        style={{ fontFamily: 'var(--font-mono)', color: personalizedColor(p.personalizedMatchPercent) }}
+                        className="text-[10px] uppercase tracking-[0.1em] mt-2"
+                      >
+                        {p.personalizedMatchPercent}% matches your syllabus
+                      </p>
+                      {resource.covers?.length > 0 && (
+                        <div className="mt-2 space-y-0.5 border-t border-black/5 pt-2">
+                          {resource.covers.map((c) => {
+                            const isMatched = matchedSet.has(c);
+                            return (
+                              <p
+                                key={c}
+                                style={{ color: isMatched ? 'var(--verdigris)' : 'var(--rust)' }}
+                                className="text-[11px] flex items-center gap-1.5"
+                              >
+                                <span>{isMatched ? '✓' : '✕'}</span> {c}
+                              </p>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
                 </button>
               );
