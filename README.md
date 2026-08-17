@@ -1,208 +1,124 @@
 ﻿# CourseCompass
 
-**Find learning resources that actually match your syllabus.**
+> Find learning resources that actually match your syllabus — then prove you understood them.
 
-CourseCompass helps computer science students stop wasting hours sifting through YouTube tutorials that either bury the actual topic under irrelevant content, or skip the exact concept the syllabus requires. Students pick their course and topic and instantly see curated resources tagged as a syllabus match, extra content, or missing a concept — with an optional personalized check against their own uploaded syllabus.
-
-**Live app:** https://course-compass-inno-viast.vercel.app
+**Live app:** https://course-compass-inno-viast.vercel.app  
+**API:** https://coursecompass-innoviast.onrender.com  
 **Repository:** https://github.com/khadija6415/CourseCompass-InnoViast
-**Backend API:** https://coursecompass-innoviast.onrender.com
-
-Built as Week 5 of the InnoViast Full-Stack Product Engineering internship track — an Innovation Discovery and MVP Sprint.
 
 ---
 
-## The Problem
+## The problem
 
-BSCS students routinely turn to YouTube and other free resources to supplement lectures — especially for programming languages like Python, C++, and core CS courses like Data Structures. This creates a recurring, frustrating pattern:
+CS students spend hours hunting for YouTube tutorials that actually match what their course syllabus covers — most search results are either too basic, too advanced, or cover the wrong sub-topics entirely. There's no way to know if a video is worth 40 minutes of your time before you watch it.
 
-- **Extra irrelevant content**: A 10-minute concept gets buried inside a 40-minute video padded with sponsor segments, tangents, or unrelated examples.
-- **Missing concepts**: A resource only covers the basic or advanced end of a topic, skipping the exact middle section the course syllabus requires — leaving gaps that surface later in assignments or exams.
+## The solution
 
-The result: students burn hours watching multiple videos just to piece together what one well-matched resource could have taught them directly.
+CourseCompass lets a student pick their course and topic, then see curated video resources automatically tagged against the syllabus:
 
-## Target User
+- ✅ **Syllabus match** — covers exactly what the course requires
+- ➕ **Extra content** — useful but goes beyond the syllabus
+- ❌ **Missing concept** — the syllabus requires this but no resource covers it yet
 
-**The Self-Supplementing CS Student** — a BSCS student (2nd–3rd year) who attends lectures but regularly turns to online video content for topics that need reinforcement, usually late at night before a deadline or exam, working alone with limited time to vet whether a resource actually fits their syllabus before committing to watching it.
+Students can also upload their own syllabus PDF or paste syllabus text, and the platform re-ranks resources by how well they personally match it.
 
-## Validation Evidence
+## Who it's for
 
-The problem was validated through structured interviews with three CS students (covering both a general study/job-search discovery phase and a focused follow-up on the specific YouTube-supplementing pain point), plus the founder's own recurring experience learning Python, C++, and core CS topics via online resources.
-
-**Key evidence:**
-- All interviewees independently described the same two failure modes: excess irrelevant content, and skipped concepts that don't match their syllabus sequence.
-- All had already developed informal coping habits (checking video comments for "this part is missing" notes, cross-referencing notes side-by-side with videos, preferring short segmented videos over long ones) — a strong signal of an unmet, validated need rather than a hypothetical one.
-
-Full discovery notes and the problem/persona definition are documented separately in the Validation Pack.
-
-## Post-Launch Validation (Usability Testing)
-
-The deployed MVP was tested live with two users (Aysha and Sajal), each completing an unassisted 4-task script covering the full core flow. Both independently — without seeing each other's feedback — requested the same improvement: a topic-by-topic breakdown of what a resource covers versus what it's missing, not just a match percentage.
-
-**Change shipped in response:** Resource cards now show a ✓ / ✕ breakdown of each covered topic against the student's uploaded syllabus, visible without an extra click. Full testing notes are in `MVP_Testing_Results.md`.
+CS students (starting with Superior University's DSA/OOP-level courses) who want to stop guessing which YouTube video is actually worth watching.
 
 ---
 
-## Features
+## Week 6 enhancements
 
-### Must-have (core flow)
-- Course and topic selection
-- Curated resource list per topic, with search and filter by match status
-- Each resource tagged: **Syllabus match** / **Extra content** / **Missing concept**
-- Resource detail page with a match-status gauge and a covers/missing topic breakdown
-- Full loading, empty, and error states throughout
-- Fully responsive layout
+Week 5 shipped the core MVP (syllabus matching, resource browsing, bookmarks, admin panel). Week 6 adds four enhancements that turn passive browsing into an active learning loop:
 
-### Should-have (added depth)
-- JWT authentication (signup/login)
-- Bookmarks — students save resources to revisit later
-- Admin panel — login-protected dashboard to manage courses, topics, and resources without touching code
-- **Syllabus Upload & Match** — students paste their course outline or upload a PDF; the system extracts keywords and computes a personalized match percentage and topic-level breakdown for every resource in that topic, without any external AI API
-
-### Explicitly out of scope (documented, not overlooked)
-- Automated AI/YouTube scraping to discover resources (curation is intentionally human-reviewed for quality and reliability)
-- A full multi-subject catalog beyond the three demo courses (Data Structures, OOP/C++, Python)
-- A native mobile app
-- Per-topic progress tracking and community-submitted resources (noted as roadmap items, not built for MVP)
-
-This scope decision kept the MVP focused on solving the core matching problem well, rather than spreading effort across a broad platform.
+| Feature | What it does |
+|---|---|
+| **Progress Tracking & Comprehension Quiz** | Students mark resources Saved → In Progress → Completed, see per-topic completion %, and take a short quiz (auto-assembled from admin-authored questions tagged to that topic) after finishing a resource. Quiz history with marks is saved. |
+| **Ratings & Reviews** | Students leave a 1–5 star rating and comment on any resource; average rating and review count show on every resource card. |
+| **Analytics Dashboard** | Admin-only view: platform-wide stats, resource popularity, per-topic completion/quiz/rating performance, and a 14-day engagement trend — all computed from real usage data, no separate tracking pipeline. |
+| **Auth & Security Hardening** | Fixed a registration hole that let any user self-assign the admin role; added short-lived access tokens + rotating refresh tokens (so sessions survive longer without re-login, but a leaked token expires fast); added rate limiting on login/register to slow brute-force attempts. |
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
 | Frontend | Next.js 15 (App Router), Tailwind CSS |
 | Backend | Node.js, Express, MongoDB Atlas (Mongoose) |
-| Auth | JWT, bcrypt |
-| File processing | Multer (uploads), pdf-parse (syllabus PDF text extraction) |
+| Auth | JWT (access + refresh tokens), bcrypt |
+| File processing | Multer (uploads), pdf-parse (syllabus text extraction) |
 | Deployment | Vercel (frontend), Render (backend) |
 
 ---
 
-## Project Structure
+## Architecture notes
 
-```
-CourseCompass-InnoViast/
-├── backend/
-│   ├── config/         # Database connection
-│   ├── controllers/    # Route logic (auth, courses, topics, resources, bookmarks, syllabus)
-│   ├── middleware/      # JWT auth guard, file upload handling
-│   ├── models/          # Mongoose schemas
-│   ├── routes/           # Express routers
-│   ├── seed.js           # Demo data seeder
-│   └── server.js
-└── frontend/
-    └── src/
-        ├── app/          # Next.js App Router pages (student + admin)
-        ├── components/   # Shared UI (CompassMark, MatchGauge, SyllabusMatchPanel, StudentNav)
-        └── lib/           # API client, auth helpers
-```
+- **Data model:** `Course → Topic → Resource` hierarchy. `Bookmark` doubles as the progress tracker (`status`: saved / in-progress / completed). `Review` and `Question`/`QuizAttempt` are independent collections keyed to `Resource`/`Topic`, so each feature can be reasoned about — and demoed — on its own.
+- **Auth flow:** Login/register issue a 15-minute access token + a 30-day refresh token (hashed with bcrypt before storage, rotated on every refresh). The frontend's `apiFetch` wrapper transparently retries a request once with a refreshed token on a 401, so sessions feel persistent without ever exposing a long-lived token on the wire more than necessary.
+- **Analytics:** Deliberately built as MongoDB aggregation queries over existing collections (bookmarks, reviews, quiz attempts) rather than a separate event-tracking system — keeps the data model simple and the numbers always consistent with what students actually see.
+- **Quiz generation:** Questions are tagged by `Topic`; when a student requests a quiz for a resource, the backend pulls all questions for that resource's topic and serves 5 at random — no AI dependency, fully admin-controlled content.
 
 ---
 
-## Local Setup
-
-### Prerequisites
-- Node.js and npm
-- A MongoDB Atlas cluster (or local MongoDB)
+## Getting started locally
 
 ### Backend
-
 ```bash
 cd backend
 npm install
-```
-
-Create a `.env` file in `backend/`:
-
-```
-PORT=5050
-MONGO_URI=<your MongoDB connection string>
-JWT_SECRET=<your secret key>
-```
-
-Seed demo data (3 courses, topics, and curated resources):
-
-```bash
-node seed.js
-```
-
-Start the server:
-
-```bash
+# create a .env file — see below
 npm run dev
 ```
 
 ### Frontend
-
 ```bash
 cd frontend
 npm install
-```
-
-Create a `.env.local` file in `frontend/`:
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:5050/api
-```
-
-Start the dev server:
-
-```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000`.
+### Environment variables (backend `.env`)
 
-### Demo Admin Login
+PORT=5050
+MONGO_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<random string>
+JWT_REFRESH_SECRET=<random string>
 
-```
-Email: admin@coursecompass.com
-Password: Admin@123
-```
 
 ---
-
 ## Screenshots
 
-**Course & Topic Selection**
-![Course and topic selection](screenshots/01-home-selection.png)
+**Student experience**
 
-**Resource List with Match Tags**
-![Resource list with match tags](screenshots/02-resource-list.png)
+| | |
+|---|---|
+| ![Home](screenshots/03-home.png) | ![Resource detail](screenshots/07-resource-detail.png) |
+| Course/topic selection | Progress tracking + quiz card |
+| ![Quiz results](screenshots/09-quiz-results.png) | ![Reviews](screenshots/10-reviews.png) |
+| Comprehension quiz score | Ratings & reviews |
 
-**Resource Detail with Match Gauge**
-![Resource detail with match gauge](screenshots/03-resource-detail.png)
+**Admin experience**
 
-**Personalized Syllabus Match**
-![Personalized syllabus match](screenshots/04-syllabus-match.png)
+| | |
+|---|---|
+| ![Analytics](screenshots/17-admin-analytics.png) | ![Quiz questions](screenshots/16-admin-quiz-questions.png) |
+| Analytics dashboard | Quiz question bank |
 
-**Admin Dashboard**
-![Admin dashboard](screenshots/05-admin-dashboard.png)
-
-**Admin — Add Resource**
-![Admin add resource](screenshots/05b-admin-add-resource.png)
-
-**Bookmarks**
-![Bookmarks](screenshots/06-bookmarks.png)
-
+Full set of 17 screenshots (signup through admin analytics) is in [`/screenshots`](./screenshots).
 ---
+
+## What we learned
+
+- User testing (Week 5) surfaced that students wanted a quick visual signal for *why* a resource was tagged "extra" or "missing" — led to the per-topic ✓/✕ concept breakdown on resource cards.
+- Building the quiz as an extension of Progress Tracking (rather than a separate feature) kept the data model simpler and gave a stronger product narrative: we validate learning, not just watch-time.
+- Keeping analytics purely aggregation-based (no new tracking collection) meant one less thing that could drift out of sync with what users actually see.
 
 ## Roadmap
 
-Items intentionally excluded from this MVP, for a future iteration:
+See [ROADMAP.md](./ROADMAP.md) for the full Must Have / Later breakdown with rationale.
 
-- Expand beyond the three demo courses into a full multi-course catalog
-- Community-submitted resource suggestions, with admin review before publishing
-- Per-topic progress tracking for students
-- Resource ratings/reviews (raised independently by a test user during usability testing)
-- Native mobile app
+## AI usage
 
----
-
-## Author
-
-Khadija Wazeer — BSCS, Superior University, Lahore
-Full-Stack Product Engineering Intern, InnoViast
+See [AI_USAGE.md](./AI_USAGE.md) for a transparent account of how AI tools were used during development.
