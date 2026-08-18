@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '@/lib/auth';
+import { logoutUser } from '@/lib/api';
 
 export default function StudentNav() {
   const router = useRouter();
@@ -12,7 +13,12 @@ export default function StudentNav() {
     setUser(getUser());
   }, []);
 
-  function handleLogout() {
+  async function handleLogout() {
+    try {
+      await logoutUser();
+    } catch (err) {
+      // ignore — clear local session regardless
+    }
     clearAuth();
     setUser(null);
     router.push('/');
@@ -23,7 +29,10 @@ export default function StudentNav() {
       {user ? (
         <>
           <button onClick={() => router.push('/bookmarks')} className="text-[var(--parchment)] hover:text-[var(--brass)] transition-colors">
-            Bookmarks
+            My Learning
+          </button>
+          <button onClick={() => router.push('/quiz-history')} className="text-[var(--parchment)] hover:text-[var(--brass)] transition-colors">
+            Quiz History
           </button>
           <span className="text-[var(--slate)]">{user.name}</span>
           <button onClick={handleLogout} className="text-[var(--slate)] hover:text-[var(--rust)] transition-colors">

@@ -2,8 +2,10 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { getResources } from '@/lib/api';
+import { getResources, getMyBookmarks } from '@/lib/api';
+import { getUser } from '@/lib/auth';
 import SyllabusMatchPanel from '@/components/SyllabusMatchPanel';
+import TopicProgressBar from '@/components/TopicProgressBar';
 
 const tagStyles = {
   match: { borderColor: 'var(--verdigris)', color: 'var(--verdigris)' },
@@ -15,6 +17,12 @@ const tagLabels = {
   match: 'Syllabus match',
   extra: 'Extra content',
   missing: 'Missing concept',
+};
+
+const statusLabels = {
+  saved: '☆ Saved',
+  'in-progress': '▶ In progress',
+  completed: '✓ Completed',
 };
 
 function personalizedColor(percent) {
@@ -35,6 +43,7 @@ function ResourcesContent() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('');
   const [personalized, setPersonalized] = useState(null);
+  const [statusMap, setStatusMap] = useState({});
 
   useEffect(() => {
     if (!topicId) return;
@@ -53,6 +62,22 @@ function ResourcesContent() {
     const timeout = setTimeout(load, 300);
     return () => clearTimeout(timeout);
   }, [topicId, search, filter]);
+
+  useEffect(() => {
+    if (!getUser()) {
+      setStatusMap({});
+      return;
+    }
+    getMyBookmarks()
+      .then((data) => {
+        const map = {};
+        data.forEach((b) => {
+          if (b.resource) map[b.resource._id] = b.status;
+        });
+        setStatusMap(map);
+      })
+      .catch(() => {});
+  }, [topicId]);
 
   function handlePersonalizedResults(results) {
     if (!results) {
@@ -97,6 +122,8 @@ function ResourcesContent() {
           {topicName}
         </h1>
         <p className="text-sm text-[var(--slate)] mb-6">Curated resources checked against your course syllabus</p>
+
+        <TopicProgressBar topicId={topicId} />
 
         <SyllabusMatchPanel topicId={topicId} onResults={handlePersonalizedResults} />
 
@@ -153,6 +180,12 @@ function ResourcesContent() {
                     </span>
                     <span className="text-xs text-[var(--slate)]">{resource.durationMinutes} min</span>
                   </div>
+
+                  {statusMap[resource._id] && (
+                    <p style={{ fontFamily: 'var(--font-mono)' }} className="text-[10px] uppercase tracking-[0.1em] text-[var(--brass)] mt-1">
+                      {statusLabels[statusMap[resource._id]]}
+                    </p>
+                  )}
 
                   {p && p.personalizedMatchPercent !== null && (
                     <>

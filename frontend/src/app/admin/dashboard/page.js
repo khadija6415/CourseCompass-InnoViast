@@ -110,9 +110,14 @@ export default function AdminDashboard() {
               Admin Dashboard
             </span>
           </div>
-          <button onClick={handleLogout} className="text-sm text-[var(--slate)] hover:text-[var(--rust)] transition-colors">
-            Log out
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={() => router.push('/admin/analytics')} className="text-sm text-[var(--brass)] hover:underline">
+              Analytics
+            </button>
+            <button onClick={handleLogout} className="text-sm text-[var(--slate)] hover:text-[var(--rust)] transition-colors">
+              Log out
+            </button>
+          </div>
         </div>
 
         {message && <p className="text-sm text-[var(--verdigris)] mb-4">{message}</p>}
@@ -158,14 +163,22 @@ export default function AdminDashboard() {
               <>
                 <ul className="space-y-2 mb-4">
                   {topics.map((t) => (
-                    <li key={t._id} className="flex items-center justify-between px-3 py-2 bg-white rounded-lg text-sm text-[var(--ink)]">
-                      {t.name}
-                      <button
-                        onClick={() => router.push(`/admin/resources?topicId=${t._id}&topicName=${encodeURIComponent(t.name)}`)}
-                        className="text-[var(--brass)] text-xs hover:underline"
-                      >
-                        Manage →
-                      </button>
+                    <li key={t._id} className="flex items-center justify-between px-3 py-2 bg-white rounded-lg text-sm text-[var(--ink)] gap-2">
+                      <span className="truncate">{t.name}</span>
+                      <span className="flex items-center gap-3 shrink-0">
+                        <button
+                          onClick={() => router.push(`/admin/resources?topicId=${t._id}&topicName=${encodeURIComponent(t.name)}`)}
+                          className="text-[var(--brass)] text-xs hover:underline"
+                        >
+                          Manage →
+                        </button>
+                        <button
+                          onClick={() => router.push(`/admin/questions?topicId=${t._id}&topicName=${encodeURIComponent(t.name)}`)}
+                          className="text-[var(--verdigris)] text-xs hover:underline"
+                        >
+                          Quiz →
+                        </button>
+                      </span>
                     </li>
                   ))}
                 </ul>
