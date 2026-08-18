@@ -1,4 +1,5 @@
 const Bookmark = require('../models/Bookmark');
+const Resource = require('../models/Resource');
 
 const getMyBookmarks = async (req, res) => {
   try {
@@ -41,4 +42,44 @@ const removeBookmark = async (req, res) => {
   }
 };
 
-module.exports = { getMyBookmarks, addBookmark, removeBookmark };
+const updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['saved', 'in-progress', 'completed'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+    let bookmark = await Bookmark.findOne({ user: req.user._id, resource: req.params.resourceId });
+    if (!bookmark) {
+      bookmark = new Bookmark({ user: req.user._id, resource: req.params.resourceId });
+    }
+    bookmark.status = status;
+    bookmark.completedAt = status === 'completed' ? new Date() : undefined;
+    await bookmark.save();
+    res.json(bookmark);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+const getTopicProgress = async (req, res) => {
+  try {
+    const { topicId } = req.params;
+    const resourceIds = await Resource.find({ topic: topicId }).distinct('_id');
+    const totalResources = resourceIds.length;
+    const completedCount = await Bookmark.countDocuments({
+      user: req.user._id,
+      status: 'completed',
+      resource: { $in: resourceIds },
+    });
+    res.json({
+      topicId,
+      totalResources,
+      completed: completedCount,
+      percentage: totalResources > 0 ? Math.round((completedCount / totalResources) * 100) : 0,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { getMyBookmarks, addBookmark, removeBookmark, updateStatus, getTopicProgress };

@@ -10,6 +10,10 @@ const resourceRoutes = require('./routes/resourceRoutes');
 const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const syllabusRoutes = require('./routes/syllabusRoutes');
+const questionRoutes = require('./routes/questionRoutes');
+const quizRoutes = require('./routes/quizRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 
@@ -29,6 +33,10 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/syllabus', syllabusRoutes);
+app.use('/api/questions', questionRoutes);
+app.use('/api/quiz', quizRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
