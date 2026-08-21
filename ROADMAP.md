@@ -26,6 +26,9 @@ These are genuine product improvements, but need more validation or infrastructu
 | **Engagement gamification (streaks, topic leaderboards)** | Could increase return visits, but risks turning learning into a vanity-metrics competition if not designed carefully — needs real user research first, not just a quick add. |
 | **Multi-university syllabus templates** | Currently syllabus matching is per-topic and manually curated. Supporting shared templates across universities would need a more general tagging taxonomy than the current `covers`/`missing` string arrays. |
 
+| **Per-student progress view for admins** | Analytics currently shows platform-wide aggregates only. A per-student breakdown (so an admin/mentor can spot and follow up with inactive students) came up directly in Week 6 user testing — valuable, but needs a privacy-conscious design (e.g. instructor-only access, clear student consent) before building. |
+| **Student-suggested courses/topics** | Testers asked for a way to request courses/topics that don't exist yet, rather than only browsing what's curated. Needs a lightweight submission + admin-review flow, similar to the planned student-submitted-resources item above. |
+
 ## Explicitly out of scope for now
 
 - Native mobile app — the responsive web app covers the primary use case (students researching resources, often on a laptop while studying).

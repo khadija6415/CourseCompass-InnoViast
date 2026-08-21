@@ -13,21 +13,28 @@ export default function HomePage() {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [loading, setLoading] = useState(true);
+  const [slowLoading, setSlowLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let slowTimer;
     async function loadCourses() {
       try {
         setLoading(true);
+        setSlowLoading(false);
+        slowTimer = setTimeout(() => setSlowLoading(true), 4000);
         const data = await getCourses();
         setCourses(data);
       } catch (err) {
-        setError('Could not load courses. Please make sure the backend server is running.');
+        setError('Could not load courses. Please refresh the page — the server may still be starting up.');
       } finally {
+        clearTimeout(slowTimer);
         setLoading(false);
+        setSlowLoading(false);
       }
     }
     loadCourses();
+    return () => clearTimeout(slowTimer);
   }, []);
 
   useEffect(() => {
@@ -82,7 +89,19 @@ export default function HomePage() {
               Resources checked against your exact syllabus — no more guessing.
             </p>
 
-            {loading && <p className="text-sm text-[var(--slate)]">Loading courses...</p>}
+            {loading && (
+              <div className="space-y-2">
+                <p className="text-sm text-[var(--slate)] flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 border-2 border-[var(--brass)] border-t-transparent rounded-full animate-spin" />
+                  Loading courses...
+                </p>
+                {slowLoading && (
+                  <p className="text-xs text-[var(--slate)] italic">
+                    The server may be waking up from idle — this can take up to a minute on the first visit. Thanks for waiting!
+                  </p>
+                )}
+              </div>
+            )}
             {error && <p className="text-sm text-[var(--rust)] mb-4">{error}</p>}
 
             {!loading && !error && (
